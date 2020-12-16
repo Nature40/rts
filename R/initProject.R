@@ -3,7 +3,7 @@
 #' @description Creates directories and a R list with all the needed rts information for one animal
 #'
 #'
-#' @author Jannis Gottwald
+#' @author Marvin Ludwig & Jannis Gottwald
 #'
 #' @param projroot string, project directory
 #' @param logger_data_raw string, path to the full RTS dataset

@@ -70,7 +70,7 @@ file.catalogue<-function(projList, station=".", collection="."){
 
     catalogue$station<-station
     catalogue$time<-as.POSIXct(catalogue$time)
-    write.csv(catalogue, paste0( paste0(projList$path$catalogues, station,"_FROM_", as.Date(min(catalogue$time)), "_TO_",as.Date(max(catalogue$time)), "_file_catalogue.csv")))
+    write.csv(catalogue, paste0( paste0(projList$path$catalogues, station,"_collection_",collection,"_FROM_", as.Date(min(catalogue$time)), "_TO_",as.Date(max(catalogue$time)), "_file_catalogue.csv")))
 }
 
 

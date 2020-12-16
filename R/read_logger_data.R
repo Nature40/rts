@@ -8,7 +8,7 @@
 #' @param station string, station of hich the files should be catagolized
 #' @param projList list, generatet by initProject function
 #' @param collection string, path to data collection in station folder from which the files should be catagolized
-#' @param c_date string, starting date of catalogue files
+#' 
 #'
 #' @export
 #'
@@ -19,13 +19,13 @@
 
 
 
-read.logger.data<-function(projList, station=".", collection=".", c_date="."){
+read.logger.data<-function(projList, station=".", collection="."){
  
 
   root<-paste0(projList$path$raw, station, "/", collection, "/")
   
   cata<-list.files(projList$path$catalogues, pattern=station, full.names=T)
-  catalogue<-read.csv( grep(paste0("*FROM_",c_date, collapse="|","*"), cata, value=TRUE))
+  catalogue<-read.csv( grep(paste0(collection, collapse="|","*"), cata, value=TRUE))
   
   counter <- 0
   

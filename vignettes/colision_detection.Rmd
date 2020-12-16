@@ -1,0 +1,172 @@
+---
+title: "colision_detection"
+output: rmarkdown::html_vignette
+author: Jannis Gottwald
+vignette: >
+  %\VignetteIndexEntry{colision_detection}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+Currently, the [radio-tracking software] (https://github.com/Nature40/Sensorboxes-Images/releases/tag/radiotracking-0.4.3) is able to scan a bandwidth of 250Khz. The frequencies of the VHF tags used should have a distance of +/- 10 khz from each other so that the signals remain separable. One way to increase the number of tags deployed at the same time is to use different signal lengths at the same frequency. For example, three transmitters can be deployed at a frequency of 150125 khz where transmitter 1 has a signal length of 10ms, transmitter 2 has a signal length of 20ms and transmitter 3 has a signal length of 40ms. The length of each recorded signal is recorded and can be used as a filter criterion. However, there are always situations in which the signal from two transmitters arrives at the same time and can therefore no longer be distinguished during siganl processing. The signal with the lower duration is then always assigned to the higher signal length. One way to detect these collisions is to identify gaps in the time series of the transmitter with the lower duration and a subsequent time match with the signals of the transmitter with the higher duration. Signals whose timestamps are very close to the timestamp of the missing signal are identified as collisions. The following script identifies gaps in the time series and then classifies the collisions.  
+
+
+### necessary packages
+
+```{r eval=FALSE}
+library(rts)
+library(data.table)
+library(ggplot2)
+```
+
+### Initialize individuals that may have collisions
+
+First, a data.frame is created that contains the most important parameters for each individual. Then a list with metadata and folder paths is created with the help of the initAnimal function from the rts-package.
+
+```{r eval=FALSE}
+
+#dataframe with all individuals
+tags<-data.frame(
+  ID=c("150007_10ms", "150007_20ms", "150007_40ms"), 
+  freq=c(150007, 150007, 150007), 
+  start=c("2020-09-21", "2020-09-21", "2020-09-21"),
+  end=  c("2020-10-01", "2020-10-01", "2020-10-01"),
+  min_dur=c(0.0096, 0.016, 0.0288), 
+  max_dur=c(0.0128, 0.0192, 0.0352))
+
+#10ms
+anml10<-initAnimal(projList = plst, animalID = tags$ID[1], freq = tags$freq[1], start=tags$start[1], end=tags$end[1])
+#20ms
+anml20<-initAnimal(projList = plst, animalID = tags$ID[2], freq = tags$freq[2], start=tags$start[2], end=tags$end[2])
+#40ms
+anml40<-initAnimal(projList = plst, animalID = tags$ID[3], freq = tags$freq[3], start=tags$start[3], end=tags$end[3])
+````
+
+### get data from rts station
+Because all three transmitters were active at the same time in the area of rts station mof_rts_00009, we expect collisions there. The data already pre-filtered for each individual with the batch.awk and the filter_interactive function are loaded.
+
+```{r eval=FALSE}
+d10lst<-list.files(anml10$path$filtered, pattern="mof_rts_00009",full.names = T)
+d20lst<-list.files(anml20$path$filtered,pattern="mof_rts_00009", full.names = T)
+d40lst<-list.files(anml40$path$filtered, pattern="mof_rts_00009",full.names = T)
+
+#data path
+path_to_d10<-d10lst[1]
+path_to_d20<-d20lst[1]
+path_to_d40<-d40lst[1]
+
+#read data
+d10<-data.table::fread(path_to_d10)
+d20<-data.table::fread(path_to_d20)
+d40<-data.table::fread(path_to_d40)
+  
+#convert timestamps
+d10$timestamp<-as.POSIXct(d10$timestamp)
+d20$timestamp<-as.POSIXct(d20$timestamp)
+d40$timestamp<-as.POSIXct(d40$timestamp)
+
+````
+
+
+### Collision detection
+The collisions must be identified receiver by receiver. Therefore, the entire data set is separated into receivers 0-3 and then the processed data is merged into data10, data20, data40 before being placed in the folder individual/filtered with the suffix _collision. 
+
+
+```{r eval=FALSE}
+
+#create data frames for rbinding  
+data10<-data.frame()
+data20<-data.frame()
+data40<-data.frame()
+  
+for ( i in c(0,1,2,3)){
+#subset to receiver
+  
+  #10ms    
+    d10_r<-d10[d10$receiver==i,]
+    d10_r<-d10_r[order(d10_r$timestamp),]
+    d10_r$collision<-"no"
+  #20ms
+    d20_r<-d20[d20$receiver==i,]
+    d20_r<-d20_r[order(d20_r$timestamp),]
+    d20_r$ID<-1:nrow(d20_r)
+    d20_r$collision<-"no"
+    d20_r$timeControld20<-d20_r$timestamp
+   #40ms
+    d40_r<-d40[d40$receiver==i,]
+    d40_r<-d40_r[order(d40_r$timestamp),]
+    d40_r$ID<-1:nrow(d40_r)
+    d40_r$collision<-"no"
+    d40_r$timeControld40<-d40_r$timestamp
+    
+#calculate timediff between consecutive signals of 10ms and 20ms tag
+    d10_r$timediff<-abs(difftime( d10_r$timestamp, d10_r$timestamp[2:length(d10_r$timestamp)], units="secs" ))
+    d20_r$timediff<-abs(difftime( d20_r$timestamp, d20_r$timestamp[2:length(d20_r$timestamp)], units="secs" ))
+
+#set ecpected timedifference in seconds    
+  #10ms
+    td10<-0.44
+  #20ms
+    td20<-0.99
+    
+#subset to timediffs that indicate a missing signal
+    d10_c<-d10_r[d10_r$timediff>=td10+(td10*0.2) & d10_r$timediff<=2*td10+(td10*0.2), ]
+    d20_c<-d20_r[d20_r$timediff>=td20+(td20*0.5) & d20_r$timediff<=2*td20+(td20*0.5), ]
+    
+#create data.frame with timestamps of missing signals 
+    c10<-data.frame(timestamp=d10_c$timestamp+td10, timestamp_control=d10_c$timestamp+td10 )
+    c20<-data.frame(timestamp=d20_c$timestamp+td20, timestamp_control=d20_c$timestamp+td20)
+    
+#convert to data.table and set key for matching
+    prepD10<-data.table::data.table(c10)
+    prepD20<-data.table::data.table(c20)
+    data.table::setkey(prepD10,timestamp)
+    data.table::setkey(prepD20,timestamp)
+    
+    victimD20<-data.table::data.table(d20_r)
+    victimD40<-data.table::data.table(d40_r)
+    data.table::setkey(victimD20,timestamp)
+    data.table::setkey(victimD40,timestamp)
+    
+#match nearest
+    p10v20 <- victimD20[prepD10, roll = "nearest"]
+    p10v40 <- victimD40[prepD10, roll = "nearest"]
+    p20v40 <- victimD40[prepD20, roll = "nearest"]
+    
+#calculate timediff between signals of affected receiver and potential collisions 
+    p10v20$timediff<-abs(difftime(p10v20$timeControld20, p10v20$timestamp_control, units="secs" ))
+    p10v40$timediff<-abs(difftime(p10v40$timeControld40, p10v40$timestamp_control, units="secs" ))
+    p20v40$timediff<-abs(difftime(p20v40$timeControld40, p20v40$timestamp_control, units="secs" ))
+    
+#set threshold (abritrary)
+    p10v20<-p10v20[p10v20$timediff<=0.06,]
+    p10v40<-p10v40[p10v40$timediff<=0.06,]
+    p20v40<-p20v40[p20v40$timediff<=0.06,]
+    
+#classify collisions
+    d20_r$collision[d20_r$ID %in% p10v20$ID]<-"yes"
+    d40_r$collision[d40_r$ID %in% p10v40$ID]<-"yes"
+    d40_r$collision[d40_r$ID %in% p20v40$ID]<-"yes"
+    
+    
+#rbind by receiver   
+    data10<-rbind(data10, d10_r)
+    data20<-rbind(data20, d20_r)
+    data40<-rbind(data40, d40_r)
+}
+
+#write to individual folder @animal$path$filtered  
+  data.table::fwrite(data10, paste0(anml10$path$filtered, "/",gsub(".csv", "", basename(path_to_d10)), "_collision.csv" ))
+  data.table::fwrite(data20[data20$collision=="no",], paste0(anml20$path$filtered, "/",gsub(".csv", "", basename(path_to_d20)), "_collision.csv" ))
+  data.table::fwrite(data40[data40$collision=="no",], paste0(anml40$path$filtered, "/",gsub(".csv", "", basename(path_to_d40)), "_collision.csv" ))
+  
+````
+

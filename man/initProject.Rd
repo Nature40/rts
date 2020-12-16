@@ -15,5 +15,5 @@ initProject(projroot = ".", logger_data_raw)
 Creates directories and a R list with all the needed rts information for one animal
 }
 \author{
-Jannis Gottwald
+Marvin Ludwig & Jannis Gottwald
 }

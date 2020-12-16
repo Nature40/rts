@@ -4,7 +4,7 @@
 \alias{read.logger.data}
 \title{create file and parameter catalogue from raw logger data}
 \usage{
-read.logger.data(projList, station = ".", collection = ".", c_date = ".")
+read.logger.data(projList, station = ".", collection = ".")
 }
 \arguments{
 \item{projList}{list, generatet by initProject function}
@@ -12,8 +12,6 @@ read.logger.data(projList, station = ".", collection = ".", c_date = ".")
 \item{station}{string, station of hich the files should be catagolized}
 
 \item{collection}{string, path to data collection in station folder from which the files should be catagolized}
-
-\item{c_date}{string, starting date of catalogue files}
 }
 \description{
 Creates a catalogue of all raw logger files in folder

@@ -96,6 +96,18 @@ x$pathString <- apply(x, 1, function(x) paste(trimws(na.omit(x)), collapse="/"))
 logger_data_raw
 ````
 
-The name of the station must be exactly the same as in the reference table for the stations (**Station.csv, data that need to be provided**). Collections can be named according to the date of data collection, for example.
+The name of the station must be exactly the same as in the reference table for the stations (**Station.csv, data that need to be provided**). Collections can be named according to the date of data collection, for example. The data looks like this: for each start time, a .csv is created for each receiver (e.g. 2020-06-09T173044_0.csv for receiver 0) as well as a configuration file for all receivers containing all the parameters set for the run (2020-06-09T173044.conf).
+
+First, a data catalogue is created from the raw data, in which the name of each file and the set parameters are saved. This is done with the help of the function file.catalogue from the rts package. The function gets the location of the raw data from the projList (initProject). The catalogues are created per station and collection and therefore these must be specified,
+
+
+
+
+```{r eval=FALSE}
+
+file.catalogue(projList = plst, station="mof_rts_00009", collection = "duration_test" )
+````
+
+
 
 

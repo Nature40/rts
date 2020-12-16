@@ -36,5 +36,5 @@ batch.awk(
 Creates .bat files for prefiltering with awk
 }
 \author{
-Marvin Ludwig & Jannis Gottwald
+Marvin Ludwig, Nicolas Friess & Jannis Gottwald
 }

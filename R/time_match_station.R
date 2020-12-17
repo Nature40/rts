@@ -19,6 +19,10 @@
 
 time_match_station<-function(animal, method, collision=FALSE){
 #get timenatches-
+  
+if (collision==TRUE){
+  fls<-list.files(animal$path$bearings,pattern="collision",full.names = T)
+}
 fls<-list.files(animal$path$bearings,full.names = T)
 
 data<-plyr::ldply(fls, function(x){data.table::fread(x)})

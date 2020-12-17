@@ -28,19 +28,28 @@ library(data.tree)
 library(raster)
 library(mapview)
 library(data.table)
-
+library(devtools)
 ```
 
-## Initialize Project
+```{r eval=FALSE}
 
-The package is structured in such a way that a project folder (projroot) is created at the beginning, in which various subfolders for intermediate products and reference data are stored. The initProject function creates these folders as well as a R object in the form of a list in which all paths are stored. In addition, the path to absolute raw data, as created by the [software](https://github.com/Nature40/Sensorboxes-Images/releases/tag/radiotracking-0.4.3), which may be stored on an external hard disk and do not need to be integrated into the project , can be specified in the iniProject function.
+install_github("Nature40/rts")
+````
+
+## required data
++ **Stations.csv:** data.frame with Name of the rts station, Coordinates in Lat/Lon and orientation of each antenna of the station. Colnames have to be Name;Longitude;Latitude;receiver;orientation. Should be stored in projroot/data/reference_data/
++ **Calibration curves:** rts data recorded during a [calibration session](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13294). One file per station and must carry complete station name in file name. Data should be stored in projroot/data/calibration_curves/. Only necessary if calibration is desired (recommended).  
++ **rts data:** either raw logger data [test data](https://hessenbox.uni-marburg.de/getlink/fiSz2C9chiQUmj5LmLXyxAzm/data) as it is produced by the [software](https://github.com/Nature40/Sensorboxes-Images/releases/tag/radiotracking-0.4.3) running on the pi, or allready processed rts data. 
+
+## Initialize Project
+The package is structured in such a way that a project folder (projroot) is created at the beginning, in which various subfolders for products and reference data are stored. The **initProject()* function creates these folders as well as a R object in the form of a list in which all paths are stored. In addition, the path to absolute raw data, as created by the [software](https://github.com/Nature40/Sensorboxes-Images/releases/tag/radiotracking-0.4.3) running on the stations, which may be stored on an external hard disk and do not need to be integrated into the project , can be specified in the iniProject function. For this tutorial please store the [test data](https://hessenbox.uni-marburg.de/getlink/fiSz2C9chiQUmj5LmLXyxAzm/data) under the path to raw data (logger_data_raw).
 
 ```{r eval=FALSE}
 
 plst<-initProject(projroot = "path/project_name/", logger_data_raw = "path/to/raw/data/")
 ````
 
-the created folder structure looks like this
+The created folder structure looks like this
 
 ```{r,results='hide', include=FALSE}
 path <- c(
@@ -66,13 +75,20 @@ x$pathString <- apply(x, 1, function(x) paste(trimws(na.omit(x)), collapse="/"))
 ```{r}
 folder.structure
 ```
-## Data that needs to be provided
-+ Stations.csv: Data.table with Name of the rts station, Coordinates in Lat/Lon and orientation of each antenna of the station. Colnames have to be Name;Longitude;Latitude;receiver;orientation. Should be stored in projroot/data/reference_data/
-+ Calibration curves: rts data recorded during a [calibration session](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13294). One file per station and must carry complete station name in file name. Data should be stored in projroot/data/calibration_curves/. Only necessary if calibration is desired (recommended).  
+
++ **/batch_awk:** executable .bat files for coarse filtering (product of **batch.awk()**) are stored here
++ **/calibration_curves:** rts data recorded during a [calibration session](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13294) is stored here.
++ **/catalogues:** Catalogues listing all raw logger data and applied config parameters (product of **file.catalogue()**) or listing all files in logger_data_csv (product of **data.catalogue()**) are stored here.
++ **/correction_values:** Calibration values for each station (product of **calibrate()**) are stored here.
++ **/Individuals:** For each processed Individual a main directory and several subdirectories are created (product of **initAnimal()**).
++ **/kplv:** Keepallive data indicating the functionality of the receivers can be stored here.
++ **/logger_data_csv:** The raw logger data is merged into one data set per station by **read.logger.data()** and stored here.
++ **/param_lst:** Filter parameters applied in **filter.interactive()** are stored here
++ **/reference_data:** Reference data such as the Station.csv or a data.frame containing information about tagged individuals should be stored here  
 
 
 ## raw data processing
-The following shows how the raw data, as it comes from the software, is processed. The data is located under "path/to/raw/data/" as specified in the initProject function. The folder structure there must look like this:  
+The following shows how the raw data, as it comes from the software running on the stations in the field, is processed. The data is located under *logger_data_raw* as specified in the **initProject()** function. The folder structure there must look like this:  
 
 ```{r,results='hide', include=FALSE}
 path <- c(
@@ -97,9 +113,9 @@ x$pathString <- apply(x, 1, function(x) paste(trimws(na.omit(x)), collapse="/"))
 logger_data_raw
 ```
 
-The name of the station must be exactly the same as in the reference table for the stations (**Station.csv, data that need to be provided**). Collections can be named according to the date of data collection, for example. The data looks like this: for each start time, a .csv is created for each receiver (e.g. 2020-06-09T173044_0.csv for receiver 0) as well as a configuration file for all receivers containing all the parameters set for the run (2020-06-09T173044.conf).
+The name of the station must be exactly the same as in the reference table for the stations (**Station.csv-required data**). Collections can be named according to the date of data collection, for example. The data looks like this: for each start time, a .csv is created for each receiver (e.g. 2020-06-09T173044_0.csv for receiver 0) as well as a configuration file for all receivers containing all the parameters set for the run (2020-06-09T173044.conf).
 
-First, a data catalogue is created from the raw data, in which the name of each file and the config parameters are saved. This is done with the help of the function file.catalogue from the rts package. The function gets the location of the raw data from the projList (initProject). The catalogues are created per station and collection and therefore these must be specified.
+First, a **file catalogue** is created from the raw data, in which the name of each file and the config parameters are saved. This is done with the help of the function **file.catalogue()**. The function receives the location of the raw data from the *projList* (**initProject()**). The catalogues are created per station and collection and therefore these must be specified.
 
 
 
@@ -109,15 +125,15 @@ First, a data catalogue is created from the raw data, in which the name of each 
 file.catalogue(projList = plst, station="mof_rts_00009", collection = "duration_test" )
 ```
 
-The catalogue is stored under **projroot/data/catalogues** with the naming convention StationName_collection_FROM_yyyy-mm-dd_TO_yyyy-mm-dd_file_catalogue.csv. 
-In order to create a common .csv file from the many individual files per station, receiver and start time, the read.logger.data function is used. Data.tables per station are stored in **projroot/data/logger_data_csv/** with the naming convention StationName_FROM_yyyy-mm-dd_TO_yyyy-mm-dd.csv.
+The catalogue is stored under *projroot/data/catalogues* with the naming convention *StationName_collection_FROM_yyyy-mm-dd_TO_yyyy-mm-dd_file_catalogue.csv*. 
+In order to create a common .csv file from the many individual files per station, receiver and start time, the **read.logger.data()** function is used. Data.tables per station are stored in *projroot/data/logger_data_csv/* with the naming convention *StationName_FROM_yyyy-mm-dd_TO_yyyy-mm-dd.csv*.
 
 ```{r eval=FALSE}
 read.logger.data(projList = plst, station="mof_rts_00009",collection = "duration_test" )
 
 ```
 
-finally a data.catalogue of all station files is generated. It contains the name of the file, the start and end date of the recording. If the raw data has already been processed in a former project or is stored outside the projroot folder for any other reason, this can be specified in the function
+finally a **data catalogue** (**data.catalogue()**) of all station files is generated. It contains the name of the file, the start and end date of the recording. If the raw data has already been processed in a former project or is stored outside the projroot folder for any other reason, this can be specified in the function
 ```{r eval=FALSE}
 data.catalogue(projList = plst,in_project = TRUE)
 
@@ -127,11 +143,18 @@ data.catalogue(projList = plst,in_project = TRUE)
 ```
 
 
-## Filtering 
+## Individual processing
 
-The data is filtered in two steps. In a rough filtering step, the programming language awk is used to create a file roughly filtered by time period, frequency and signal length. Subsequently, the fine filtering is carried out with the help of a semi-automated interactive function.
+Processing of individuals involves
 
-Before filtering can take place, the initAnimal function is used to create a folder structure under projroot/data/individuals/ for the individual to be processed, as well as an R object with two lists. One list contains the meta information such as ID, frequency, start and end time, and the other the paths to the newly created folders.
++ Filtering (coarse, fine, collisions)
++ Timematching of receivers per station
++ Bearing calculation
++ Timematching of stations
++ Triangulations
+
+The **initAnimal()** function is used to create a folder structure under *projroot/data/individuals/* for the individual to be processed, as well as an R object with two lists. One list contains the meta information such as *ID*, *frequency*, *start* and *end* time, and the other the paths to the newly created folders.
+
 
 ```{r eval=FALSE}
 anml<-initAnimal(projList = plst, freq = 150007, start = "2020-09-23", end="2020-10-02", animalID = "150007_10ms")
@@ -174,11 +197,28 @@ x$pathString <- apply(x, 1, function(x) paste(trimws(na.omit(x)), collapse="/"))
 folder.structure
 ```
 
-### raw filter
-Now it's time to experience the magic of awk. This may require an installation process. For a short tutorial under Windows see [here](https://stackoverflow.com/questions/21927944/how-to-run-an-awk-commands-in-windows). 
++ **/bearings:** calculated bearings as product of **calc_bearings()**.
++ **/calibrated:** Calibrated data
++ **/filtered:** Fine filtered data as a product of **filter.interactive()**
++ **/filtered_awk:** Coarse filtered data using awk (**batch.awk()**).
++ **/gps_timematch:** If gps matched reference data is created, store it here.
++ **/imputed:** If missing data is handled, products should be stored here
++ **/logger_timematch:** The time stamps of the same signal can differ on the different receivers of the same station (problem in fft). The function **time_match_logger()** deals with the problem. Results are stored here.
++ **/station_timematch:** For triangulation, stations need to be timematched. Results of **time_match_station()** are stored here.
++ **/triangulations:** Triangulations as results of **triangulate()** are stored here
 
-The batch.awk function creates an awk command for the respective individual in which start and end time, frequency, the allowed frequency error (with high signal strengths there is a scattering of the frequency of up to 15 kHz), the minimum and maximum expected signal length must be specified and the list generated by the initAnimal function must be provided.Again, it must be decided wether the data to be processed ist within the project (projroot/data/logger_data_csv) or somewehere else. The batch.awk function makes youse of the data.calogue to only include files that contain data within the start and end date of the individual. It  creates an executable .bat file for each individual containig the awk command. Files are stored here: projroot/data/batch_awk. 
-Because awk works very efficiently, many .bat files can be executed (by duble click) at the same time without overloading the memory.
+
+
+
+### Filter
+The data is filtered in two steps. In a rough filtering step, the programming language awk is used to create a file roughly filtered by time period, frequency and signal length. Subsequently, the fine filtering is carried out with the help of a semi-automated interactive function.
+
+
+### raw filter
+It's time to experience the magic of awk. This may require an installation process. For a short tutorial under Windows see [here](https://stackoverflow.com/questions/21927944/how-to-run-an-awk-commands-in-windows). 
+
+The **batch.awk()** function creates an awk command for the respective individual in which *start* and *end* time, *frequency*, the allowed *frequency error* (with high signal strengths there is a scattering of the frequency of up to 15 kHz), the minimum and maximum expected *signal length* must be specified and the list generated by the **initAnimal()** function must be provided. Again, it must be decided wether the data to be processed ist within the project (projroot/data/logger_data_csv) or somewehere else. The **batch.awk()** function makes youse of the *data.calogue* to only include files that contain data within the start and end date of the individual. It  creates an executable .bat file for each individual containig the awk command. Files are stored here: *projroot/data/batch_awk*. 
+Because awk works very efficiently, many .bat files can be executed (by double click) at the same time without overloading the memory.
 
 ```{r eval=FALSE}
  batch.awk(animal=anml, projList = plst, freq_er_l = 10, freq_er_r = 10, min_dur = 0.0096, max_dur = 0.0128, in_project = TRUE)
@@ -191,7 +231,7 @@ Because awk works very efficiently, many .bat files can be executed (by duble cl
 
 ### fine filter
 
-For fine filtering there is an interactive function (filter.interactive). It needs the project list (from initProject), the individual list (from initAnimal), the path to a awk filtered file and a number to indicate how the dataset should be subset for the plots. The number should be higher if a lot of data is to be filtered.
+For fine filtering there is an interactive function (**filter.interactive()**). It needs the project list (**initProject()**), the individual list (**initAnimal()**), the path to a awk filtered file and a number to indicate how the dataset should be subset for the plots. The number should be higher if a lot of data is to be filtered.
 
 ```{r eval=FALSE}
 filter_interactive(projList=plst,animal = anml,path_to_data ="projroot/data/individuals/150007_10ms/filtered_awk/mof_rts_00009_FROM_2020-09-22_TO_2020-10-01.csv", nth=100)
@@ -261,8 +301,91 @@ Y
 
 This normally completes the filtering. If several transmitters with different durations have been running on the same frequency, the [collision filter](https://github.com/Nature40/rts/blob/main/vignettes/colision_detection.Rmd) must be applied here.
 
-###
+### Timematch receivers of the same station
 
+Before bearing calculation the filtered data (*data/individuals/filtered*) needs to be timematched by individual Antennas of the station. To apply the time_match_logger() function, the individual list (**initAnimal()**) and the path to the data need to be specified. If [collision fitered data](https://github.com/Nature40/rts/blob/main/vignettes/colision_detection.Rmd) is used, this can be indicated by the *collision=* argument. If *collision=TRUE* a suffix is appended to the resulting filename. The resulting files are stored under *data/individuals/individual/logger_timematch*.
+
+
+```{r eval=FALSE}
+ time_match_logger(animal=anml, path_to_data = "data/individuals/150007_10ms/filtered/mof_rts_00009_FROM_2020-09-22_TO_2020-10-01_filtered", collision = TRUE)
+```
+
+
+### bearing calculation
+
+Bearings (**calc_bearings()**) are calculated based on the principle of bearing calculation described [here](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13294). Both, the acos and the linear approach are calculated. The following arguments need to be provided:  
+
+* projList: result of **initProject()**  
+* animal: result of **initAnimal()**
+* path_to_data: path to the **time_match_logger()** data of a station.
+* antennas: **Station.csv**- see required data
+* dbLoss: expected gain loss in dB between 0° and 90°. Antennaspecific- With HB9Cv antennas best results are obtained with 21dB
+* calibrate: if *calibrate=TRUE* the function searches for correction values in *data/correction_values* and calibrates the data  
+
+Results are stored in *data/individuals/individual/bearings*.
+
+
+```{r eval=FALSE}
+
+# Station.csv named antennas_2020.csv is sored in data/reference/data
+ant<- ant<-read.csv(paste0(plst$path$ref, "antennas_2020.csv"))
+calc_bearings(projList=plst, animal=anml, path_to_data = "data/indivisuals/150007_10ms/mof_rts_00009_FROM_2020-09-22_TO_2020-10-01_logger_time_match.csv", antennas =ant , dbLoss = 21, calibrate=TRUE )
+
+
+````
+
+
+### Time match stations
+
+For triangulations the signals received on different stations need to be timematched. This step is applied when all relevant stations are filtered(**batch.awk()**, **filter_interactive()**), loggers of stations are timematched (**time_match_logger()**) and bearings are calculated (**calc_bearings()**) . The function **time_match_stations()** lists all data stored in *data/individuals/individual/bearings*. Therefore the individual list (**initAnimal()**) must be provided. If *collision=TRUE* only files with the suffix collision are listed. You must decide which bearing calculation method you want to choose (currently only *acos* and *linear*).  One file containig data of all stations is created and stored under */data/individuals/individual/station_timematch/*. The method is appended as a suffix to the file name.
+
+```{r eval=FALSE}
+
+time_match_station(animal=anml, method="linear", collision=TRUE)
+
+````
+
+
+### Triangulate
+ Finally triangulations using all possible dual combinations of stations are calculated (**triangulate()**). Again the bearing methos must be indicated, the path to the data resulting from **time_match_station()** must be provided as well as the individual list (**initAnimal()**) and the Staion.csv. If *collision=TRUE* a suffix is appended to the file name. Dat is stored under *data/individuals/individual/triangulations/*.
+
+
+```{r eval=FALSE}
+
+triangulate(method = "linear", path_to_data = "data/individuals/15007_10ms/station_timematch/150007_10ms_FROM_2020-09-22_TO_2020-10-01_station_timematch_linear.csv",antennas = ant, animal = anml, collision=TRUE)
+````
+
+### Plot triangulations
+
+```{r eval=FALSE}
+
+#get triangulations
+fls<-list.files(anml$path$triangulations, full.names = T)
+tri<-fread(fls[1])
+#delete na coordinates
+tri<-tri[!(is.na(tri$X)|is.na(tri$Y)),]
+tri<-as.data.frame(tri)
+#delete data with to flat or to sharp intersection angles
+tri<-tri[tri$intersection<=140 & tri$intersection>=40,]
+#only data with a dB value >60 on the main antenna
+tri<-tri[tri$max_dB_s1>=60 & tri$max_dB_s2>=60,]
+tri<-tri[!(is.na(tri$X)|is.na(tri$Y)),]
+
+#plot relevant antennas
+plot_ant<-ant[ant$Name=="mof_rts_00004" | ant$Name=="mof_rts_00009",]
+#trabsform to spatial data
+coordinates(tri) <- c("X", "Y")
+proj4string(tri) <- CRS("+init=epsg:4326") # WGS 84
+coordinates(plot_ant) <- c("Longitude", "Latitude")
+proj4string(plot_ant) <- CRS("+init=epsg:4326") # WGS 84
+#data<- spTransform(data, CRS("+init=epsg:32632"))
+mapview(tri, color="red")+plot_ant
+
+````
+
+
+##Final notes
+This package provides a common processing frame work for rts data, enabling easy exchange of products and scripts. Automatic processing of multiple individuals can be easily acomplished by e.g. for-looping through a data.frame of individual information. But this is up to you know!
 
 
 

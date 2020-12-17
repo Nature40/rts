@@ -384,8 +384,10 @@ mapview(tri, color="red")+plot_ant
 ````
 
 
-##Final notes
-This package provides a common processing frame work for rts data, enabling easy exchange of products and scripts. Automatic processing of multiple individuals can be easily acomplished by e.g. for-looping through a data.frame of individual information. But this is up to you know!
+
+## Final notes
+
+This package provides a processing frame work for rts data, enabling easy exchange of products and scripts. Automatic processing of multiple individuals can be easily acomplished by e.g. for-looping through a data.frame of individual information. But this is up to you know!
 
 
 

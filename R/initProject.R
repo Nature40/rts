@@ -45,9 +45,9 @@ initProject = function(projroot = ".",logger_data_raw
               c_Curves= paste0(projroot, "/data/calibration_curves/"),
               correction = paste0(projroot, "/data/correction_values/"),
               ids= paste0(projroot, "/data/individuals/"),
-              awk=paste0(projroot, "/data/batch_awk"),
+              awk=paste0(projroot, "/data/batch_awk/"),
               param_lst=paste0(projroot, "/data/param_lst"),
-              models=paste0(projroot, "/data/models"),
+              models=paste0(projroot, "/data/models/"),
               fun=paste0(projroot, "R/fun/")
               )
 

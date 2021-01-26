@@ -4,7 +4,7 @@
 \alias{predict_bearings}
 \title{bearing prediction}
 \usage{
-predict_bearings(data, animal, mxNA, path_to_data)
+predict_bearings(animal, mxNA, path_to_data)
 }
 \arguments{
 \item{animal}{list, generatet by initanimal}

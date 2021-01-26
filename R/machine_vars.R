@@ -52,15 +52,18 @@ machine_vars<-function(path_to_data,animal, w=c(5,11) ){
   data$sigDiff_0_3<-data$`a_0`-data$`a_3`
   
   
-  colms<-c("a_1", "a_2", "a_3", "sigDiff_0_1", "sigDiff_1_2", "sigDiff_2_3", "sigDiff_3_0", "sigDiff_0_3")
-  data<-scale.many_sc(data, cols=colms)
+  colms<-c("a_0","a_1", "a_2", "a_3", "sigDiff_0_1", "sigDiff_1_2", "sigDiff_2_3", "sigDiff_3_0", "sigDiff_0_3")
+  
+  from<-grep(colms[1], colnames(data))
+  to<-grep("sigDiff_0_3",colnames(data))
+  data<-scale.many_sc(data, cols=c(from:to))
   
   data<-normalize.many_sc(data, cols=colms)
   data<-rollaply.many(dat=data, cols=colms,funs=c("mean", "median", "max"), window=w[1] )
   data<-rollaply.many(dat=data, cols=colms,funs=c("mean", "median", "max"), window=w[2] )
   
   
-  data.table::fwrite(data, paste0(animal$path$vars, "/",data$station[1], "_ML_variables.csv"))
+  data.table::fwrite(data, paste0(animal$path$vars, "/",data$station[1], "ML_variables.csv"))
   
 }
 

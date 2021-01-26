@@ -39,7 +39,7 @@
   data$ML = make360(p$mu * 180 / pi)
   data<-data[,c("timestamp","station", "antennas","naCount","max_dB","ML")] 
   
-  data.table::fwrite(tmp, paste0(anml$path$bearings, "/",data$station[1], "_bearings_ML.csv"))
+  data.table::fwrite(data, paste0(anml$path$bearings, "/",data$station[1], "_bearings_ML.csv"))
 }
 
 make360 <- function(lon) {

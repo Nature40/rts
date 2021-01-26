@@ -63,7 +63,7 @@ machine_vars<-function(path_to_data,animal, w=c(5,11) ){
   data<-rollaply.many(dat=data, cols=c(from:to),funs=c("mean", "median", "max"), window=w[2] )
   
   
-  data.table::fwrite(data, paste0(animal$path$vars, "/",data$station[1], "ML_variables.csv"))
+  data.table::fwrite(data, paste0(animal$path$vars, "/",data$station[1], "_ML_variables.csv"))
   
 }
 

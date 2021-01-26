@@ -45,11 +45,11 @@ data$Y[i]<-tri$y[1]
 data<-data[!is.na(data$X),]
 if(collision==FALSE){
 data$timestamp<-as.POSIXct(data$timestamp)
-fwrite(data, paste0(animal$path$triangulations, "/", anml$meta$animalID,"_FROM_", as.Date(min(data$timestamp)), "_TO_",as.Date(max(data$timestamp)),"_triangulations_", method, ".csv"))}
+data.table::fwrite(data, paste0(animal$path$triangulations, "/", anml$meta$animalID,"_FROM_", as.Date(min(data$timestamp)), "_TO_",as.Date(max(data$timestamp)),"_triangulations_", method, ".csv"))}
 
 if(collision==TRUE){
   data$timestamp<-as.POSIXct(data$timestamp)
-  fwrite(data, paste0(animal$path$triangulations, "/", anml$meta$animalID,"_FROM_", as.Date(min(data$timestamp)), "_TO_",as.Date(max(data$timestamp)),"_triangulations_", method, "_collision.csv"))}
+  data.table::fwrite(data, paste0(animal$path$triangulations, "/", anml$meta$animalID,"_FROM_", as.Date(min(data$timestamp)), "_TO_",as.Date(max(data$timestamp)),"_triangulations_", method, "_collision.csv"))}
 
 
 

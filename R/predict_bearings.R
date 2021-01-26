@@ -19,7 +19,7 @@
 
 
 
-  predict_bearings<-function(data, animal, mxNA, path_to_data){
+  predict_bearings<-function(animal, mxNA, path_to_data){
   
   data<-data.table::fread(path_to_data)
 

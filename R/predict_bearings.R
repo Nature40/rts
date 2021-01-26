@@ -34,7 +34,7 @@
   mod<-readRDS(mod[1])
   
 
-  p = predict(object = mod, newdata = data)
+  p = disttree:::predict.distforest(object = mod, newdata = data)
   
   data$ML = make360(p$mu * 180 / pi)
   data<-data[,c("timestamp","station", "antennas","naCount","max_dB","ML")] 

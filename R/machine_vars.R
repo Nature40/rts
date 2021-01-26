@@ -58,9 +58,9 @@ machine_vars<-function(path_to_data,animal, w=c(5,11) ){
   to<-grep("sigDiff_0_3",colnames(data))
   data<-scale.many_sc(data, cols=c(from:to))
   
-  data<-normalize.many_sc(data, cols=colms)
-  data<-rollaply.many(dat=data, cols=colms,funs=c("mean", "median", "max"), window=w[1] )
-  data<-rollaply.many(dat=data, cols=colms,funs=c("mean", "median", "max"), window=w[2] )
+  data<-normalize.many_sc(data, cols=c(from:to))
+  data<-rollaply.many(dat=data, cols=c(from:to),funs=c("mean", "median", "max"), window=w[1] )
+  data<-rollaply.many(dat=data, cols=c(from:to),funs=c("mean", "median", "max"), window=w[2] )
   
   
   data.table::fwrite(data, paste0(animal$path$vars, "/",data$station[1], "ML_variables.csv"))

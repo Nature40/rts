@@ -38,6 +38,7 @@ initAnimal = function(projList,
   dir.create(paste0(projList$path$ids, animalID, "/gps_timematch"), showWarnings = FALSE)
   dir.create(paste0(projList$path$ids, animalID, "/bearings"), showWarnings = FALSE)
   dir.create(paste0(projList$path$ids, animalID, "/triangulations"), showWarnings = FALSE)
+  dir.create(paste0(projList$path$ids, animalID, "/variables"), showWarnings = FALSE)
   
 
   # save meta data
@@ -48,15 +49,16 @@ initAnimal = function(projList,
   # get paths
   path = list(raw = projList$path$csv,
               root = paste0(projList$path$ids, animalID),
-              filtered_awk=paste0(projList$path$ids, animalID, "/filtered_awk"),
-              filtered=paste0(projList$path$ids, animalID, "/filtered"),
-              logger_timematch=paste0(projList$path$ids, animalID, "/logger_timematch"),
-              station_timematch=paste0(projList$path$ids, animalID, "/station_timematch"),
-              imputed=paste0(projList$path$ids, animalID, "/imputed"),
-              calibrated=paste0(projList$path$ids, animalID, "/calibrated"),
-              gps_matched=paste0(projList$path$ids, animalID, "/gps_timematch"),
-              bearings=paste0(projList$path$ids, animalID, "/bearings"),
-              triangulations=paste0(projList$path$ids, animalID, "/triangulations")
+              filtered_awk=paste0(projList$path$ids, animalID, "/filtered_awk/"),
+              filtered=paste0(projList$path$ids, animalID, "/filtered/"),
+              logger_timematch=paste0(projList$path$ids, animalID, "/logger_timematch/"),
+              station_timematch=paste0(projList$path$ids, animalID, "/station_timematch/"),
+              imputed=paste0(projList$path$ids, animalID, "/imputed/"),
+              calibrated=paste0(projList$path$ids, animalID, "/calibrated/"),
+              gps_matched=paste0(projList$path$ids, animalID, "/gps_timematch/"),
+              bearings=paste0(projList$path$ids, animalID, "/bearings/"),
+              triangulations=paste0(projList$path$ids, animalID, "/triangulations/"),
+              vars=paste0(projList$path$ids, animalID, "/variables/")
               )
 
   animal = list(meta = meta,

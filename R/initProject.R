@@ -29,6 +29,11 @@ initProject = function(projroot = ".",logger_data_raw
   dir.create(paste0(projroot, "/data/individuals/"), showWarnings = FALSE)
   dir.create(paste0(projroot, "/data/batch_awk"), showWarnings = FALSE)
   dir.create(paste0(projroot, "/data/param_lst"), showWarnings = FALSE)
+  dir.create(paste0(projroot, "/data/models"), showWarnings = FALSE)
+  dir.create(paste0(projroot, "R/"), showWarnings = FALSE)
+  dir.create(paste0(projroot, "results/"), showWarnings = FALSE)
+  dir.create(paste0(projroot, "R/scripts/"), showWarnings = FALSE)
+  dir.create(paste0(projroot, "R/fun/"), showWarnings = FALSE)
   # save meta data
  
   # get paths
@@ -41,7 +46,9 @@ initProject = function(projroot = ".",logger_data_raw
               correction = paste0(projroot, "/data/correction_values/"),
               ids= paste0(projroot, "/data/individuals/"),
               awk=paste0(projroot, "/data/batch_awk"),
-              param_lst=paste0(projroot, "/data/param_lst")
+              param_lst=paste0(projroot, "/data/param_lst"),
+              models=paste0(projroot, "/data/models"),
+              fun=paste0(projroot, "R/fun/")
               )
 
   project = list(path = path)

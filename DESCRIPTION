@@ -22,4 +22,7 @@ Imports:
     dplyr,
     zoo,
     imputeTS,
-    circtree
+    circtree,
+    stringr,
+    data.table,
+    fasttime

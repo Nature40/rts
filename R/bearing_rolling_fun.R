@@ -54,7 +54,7 @@ data<-data[order(data$ftime),]
 
 for(i in 1:nrow(data)){
   
-  #print(i)
+  print(i)
 
   tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
 
@@ -166,13 +166,10 @@ if(length(unique(tmp$station))>1){
   df$timestamp<-data$timestamp[i]
 
   df$offset<-tw
-}
-
-df<-as.data.frame(df)
-
-tri_points<-rbind(df, tri_points)
-
-}
+  df<-as.data.frame(df)
+  
+  tri_points<-rbind(df, tri_points)
+}}
 
 
 saveRDS(tri_points, paste0(anml$path$triangulations,"/", anml$meta$animalID, "_telemtr_triangulations.rds"))

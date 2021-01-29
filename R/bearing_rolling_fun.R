@@ -67,11 +67,6 @@ if(length(unique(tmp$station))>1){
 
   sp::proj4string(tmp) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
 
-  if(plot_bearings==TRUE){
-    plot(tmp)
-    telemetr:::drawVectors(~ML|animal,tmp)
-  }
-
 
     tryCatch(
       expr = {
@@ -119,6 +114,19 @@ if(length(unique(tmp$station))>1){
         rmr<-NULL
       }
     )
+  
+  
+  if(plot_bearings==TRUE){
+    
+    plot(NA,xlim=range(coordinates(tmp)[,1],coordinates(hub[,1]),coordinates(tmle[,1]), coordinates(and[,1])),
+         ylim=range(coordinates(m)[,2],coordinates(hub[,2]),coordinates(and[,2])))
+    points(tmp)
+    telemetr:::drawVectors(~ML|animal,tmp)
+    points(mle,pch=19,col="blue")
+    points(and,pch=20,col="red")
+    points(hub,pch=20,col="green")
+
+  }
     
     
     tryCatch(
@@ -168,8 +176,10 @@ if(length(unique(tmp$station))>1){
   df$offset<-tw
   df<-as.data.frame(df)
   
+  
+}
   tri_points<-rbind(df, tri_points)
-}}
+  }
 
 
 saveRDS(tri_points, paste0(anml$path$triangulations,"/", anml$meta$animalID, "_telemtr_triangulations.rds"))

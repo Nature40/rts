@@ -29,7 +29,7 @@ tri_points<-data.frame()
 
 stations<-antennas[!duplicated(antennas$Name),]
 
-fls<-list.files(anml$path$bearings,pattern=method, full.names = TRUE)
+fls<-list.files(animal$path$bearings,pattern=method, full.names = TRUE)
 
 #read data and match coordinates
 data<-plyr::ldply(fls, function(x){

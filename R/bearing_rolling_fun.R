@@ -1,6 +1,7 @@
 #' triangulation 
 #'
-#' @description triangulate by using telemtr package by barry rowlingson (https://github.com/barryrowlingson/telemetr)
+#' @description triangulate using telemtr package (not on CRAN) by barry rowlingson (https://github.com/barryrowlingson/telemetr). Methods are described here: https://www.jstor.org/stable/1268030?seq=1#metadata_info_tab_contents. Use remote::install_github("barryrowlingson/telemetr") and set "no errors from warnings" to TRUE before installing the package - Sys.setenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS"=TRUE).
+#'
 #'
 #'
 #' @author Jannis Gottwald

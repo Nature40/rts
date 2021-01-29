@@ -16,13 +16,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
 VignetteBuilder: knitr
 Imports: 
     dplyr,
     zoo,
-    imputeTS,
     circtree,
+    imputeTS,
     stringr,
     data.table,
     fasttime

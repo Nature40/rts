@@ -39,6 +39,7 @@ initAnimal = function(projList,
   dir.create(paste0(projList$path$ids, animalID, "/bearings"), showWarnings = FALSE)
   dir.create(paste0(projList$path$ids, animalID, "/triangulations"), showWarnings = FALSE)
   dir.create(paste0(projList$path$ids, animalID, "/variables"), showWarnings = FALSE)
+  dir.create(paste0(projList$path$ids, animalID, "/bearings_filtered"), showWarnings = FALSE)
   
 
   # save meta data
@@ -58,7 +59,8 @@ initAnimal = function(projList,
               gps_matched=paste0(projList$path$ids, animalID, "/gps_timematch/"),
               bearings=paste0(projList$path$ids, animalID, "/bearings/"),
               triangulations=paste0(projList$path$ids, animalID, "/triangulations/"),
-              vars=paste0(projList$path$ids, animalID, "/variables/")
+              vars=paste0(projList$path$ids, animalID, "/variables/"),
+              bearings_filtered=paste0(projList$path$ids, animalID, "/bearings_filtered/")
               )
 
   animal = list(meta = meta,

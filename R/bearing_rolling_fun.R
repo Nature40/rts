@@ -54,7 +54,7 @@ data<-data[order(data$ftime),]
 
 for(i in 1:nrow(data)){
   
-  print(i)
+  print((i/nrow(data)))
 
   tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
 
@@ -118,8 +118,7 @@ if(length(unique(tmp$station))>1){
   
   if(plot_bearings==TRUE){
     
-    plot(NA,xlim=range(coordinates(tmp)[,1],coordinates(hub[,1]),coordinates(tmle[,1]), coordinates(and[,1])),
-         ylim=range(coordinates(m)[,2],coordinates(hub[,2]),coordinates(and[,2])))
+    plot(tmp, xlim=range(8.665209, 8.700571), ylim=range(50.826948, 50.849172))
     points(tmp)
     telemetr:::drawVectors(~ML|animal,tmp)
     points(mle,pch=19,col="blue")
@@ -178,7 +177,8 @@ if(length(unique(tmp$station))>1){
   
   
 }
-  tri_points<-rbind(df, tri_points)
+  if(is.data.frame(df)){
+  tri_points<-rbind(df, tri_points)}
   }
 
 

@@ -1,4 +1,4 @@
-#' triangulate
+#' tri
 #'
 #' @export
 #'
@@ -11,7 +11,7 @@
 
 
 
-triang <- function(x1,y1,alpha1,x2,y2,alpha2){
+tri <- function(x1,y1,alpha1,x2,y2,alpha2){
   # For Triangulation GK Coordinates are necesarry!
   # First calculate tan keeping in mind that 0° in geo-coordinates are 90° in a x-y plane
   ta1 <- (alpha1%%360)/180*pi

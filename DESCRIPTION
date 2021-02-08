@@ -17,18 +17,16 @@ RoxygenNote: 7.1.1
 Suggests: 
     knitr,
     rmarkdown,
+    circtree
 VignetteBuilder: knitr
 Imports: 
     dplyr,
     zoo,
-    circtree,
     imputeTS,
     stringr,
     data.table,
     fasttime,
     swfscMisc,
     raster,
-    mapview,
-    doParallel,
-    parallel,
-    foreach
+    sp,
+    telemetr

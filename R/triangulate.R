@@ -35,7 +35,7 @@ for( i in 1:nrow(data)){
  # print(i)
 s1<-antennas[as.character(antennas$Name)==as.character(data$name_s1)[i],]
 s2<-antennas[as.character(antennas$Name)==as.character(data$name_s2)[1],]
-tri<-triang(s1$Longitude[1],s1$Latitude[1],data$s1[i],
+tri<-tri(s1$Longitude[1],s1$Latitude[1],data$s1[i],
                 s2$Longitude[1],s2$Latitude[1],data$s2[i])
 
 data$X[i]<-tri$x[1]
@@ -76,7 +76,7 @@ tri_in<-function(method, data, stations){
     stations<-as.data.frame(stations)
     s1<-stations[as.character(stations$Name)==as.character(data$name_s1)[i],]
     s2<-stations[as.character(stations$Name)==as.character(data$name_s2)[i],]
-    tri<-triang(s1$Longitude[1],s1$Latitude[1],data$s1[i],
+    tri<-tri(s1$Longitude[1],s1$Latitude[1],data$s1[i],
                 s2$Longitude[1],s2$Latitude[1],data$s2[i])
     
     if(is.data.frame(tri)){

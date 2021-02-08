@@ -11,7 +11,7 @@
 #' @param td_to_gps numeric, timedifference between bearing timestamps (UTC) and gps timestamp
 #' @param gps data.frame, gps data
 #' @param nth num, subset data for plotting using only every nth column
-#' 
+#' @import data.table
 #'
 #' @export
 #'

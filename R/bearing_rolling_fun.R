@@ -22,6 +22,7 @@
 #' @param ylim numeric, y limits for plot
 #' @param GPS logical, if true reference gps data is expected in cols lon/lat
 #' @import data.table
+#' @import telemetr
 #'
 #' @export
 #'
@@ -58,28 +59,29 @@ data<-data[order(data$ftime),]
 
 #turn stations spatial for plotting
 sp::coordinates(stations) <- c("Longitude", "Latitude")
-sp::proj4string(stations) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+sp::proj4string(stations) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
 
 if(GPS==TRUE & plot_results==TRUE){
+  print("plot_it_gps")
   
   tri_points<-plot_it_gps(data=data, tw=tw, xlim=xlim, ylim=ylim, animal=animal,epsg=epsg, stations=stations, x=x)
   
 }
 
 if(GPS==TRUE & plot_results==FALSE){
-  
+  print("dont_plot_it_gps")
   tri_points<-dont_plot_it_gps(data=data, tw=tw,animal=animal,epsg=epsg, stations=stations, x=x, keep_cores=keep_cores)
   
 }
 
 if(GPS==FALSE & plot_results==FALSE){
-  
+  print("dont_plot_it_gps")
   tri_points<-dont_plot_it(data=data, tw=tw, animal=animal,epsg=epsg, sations=stations, x=x, keep_cores=keep_cores)
   
 }
 
 if(GPS==FALSE & plot_results==TRUE){
-  
+  print("plot_it")
   tri_points<-plot_it(data=data, tw=tw, xlim=xlim, ylim=ylim, animal=animal,epsg=epsg, stations=stations, x=x)
   
 }
@@ -104,6 +106,7 @@ plot_it<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
     # subset data in time window
     tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
     tmp<-as.data.frame(tmp)
+    tmp<-tmp[!is.na(tmp$be),]
     tmp$animal<-animal$meta$animalID
     
     if(any(tmp$be>360)){next}
@@ -135,13 +138,13 @@ plot_it<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
       
       
       sp::coordinates(tmp) <- c("x", "y")
-      sp::proj4string(tmp) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(tmp) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       
       sp::coordinates(intersect) <- c("x", "y")
-      sp::proj4string(intersect) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(intersect) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       
       sp::coordinates(intersect_mean) <- c("x", "y")
-      sp::proj4string(intersect_mean) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(intersect_mean) <-sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       
       
       
@@ -183,18 +186,17 @@ dont_plot_it<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_core
   # create data frame to fill
   tri_points<-data.frame()
   # check number of cores
-  ncores<-parallel::detectCores()
-  # register number of cores - cores_t_keep
-  cl <- parallel::makeCluster(ncores-keep_cores)
-  doParallel::registerDoParallel(cl)
   
   # triangulate in parallel 
-  foreach(i = 6000:nrow(data),) %dopar% {
+  for(i in 1:nrow(data)){
+    print(i)
     
     # subset data in time window
     tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
     tmp<-as.data.frame(tmp)
+    tmp<-tmp[!is.na(tmp$be),]
     tmp$animal<-animal$meta$animalID
+    
     
     if(any(tmp$be>360)){next}
     if(length(unique(tmp$station))>1){
@@ -206,7 +208,7 @@ dont_plot_it<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_core
       
       # turn tmp to spatial
       sp::coordinates(tmp) <- c("x", "y")
-      sp::proj4string(tmp) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(tmp) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       # triangulate using telemtr package
       tlmetr<-calc_telemetr(tmp=tmp, i=i, data=data, tmp2=tmp2, tw=tw, animal=animal)
       
@@ -218,7 +220,7 @@ dont_plot_it<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_core
       tri_points<-rbind(tlmetr$df, tri_points)}
   }
   
-  parallel::stopCluster(cl)
+
   
   return(tri_points)
   
@@ -239,6 +241,7 @@ plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
     # subset data in time window
     tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
     tmp<-as.data.frame(tmp)
+    tmp<-tmp[!is.na(tmp$be),]
     tmp$animal<-animal$meta$animalID
     
     if(any(tmp$be>360)){next}
@@ -270,17 +273,17 @@ plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
       gps<-tmp
       
       sp::coordinates(tmp) <- c("x", "y")
-      sp::proj4string(tmp) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(tmp) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       
       sp::coordinates(intersect) <- c("x", "y")
-      sp::proj4string(intersect) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(intersect) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       
       sp::coordinates(intersect_mean) <- c("x", "y")
-      sp::proj4string(intersect_mean) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(intersect_mean) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       
       
       sp::coordinates(gps) <- c("lon", "lat")
-      sp::proj4string(gps) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(gps) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       
       
       tlmetr<-calc_telemetr(tmp=tmp, i=i, data=data, tmp2=tmp2, tw=tw, animal=animal)
@@ -326,19 +329,17 @@ plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
 dont_plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_cores){
   
   # create data frame to fill
+  
+  
   tri_points<-data.frame()
-  # check number of cores
-  ncores<-parallel::detectCores()
-  # register number of cores - cores_t_keep
-  cl <- parallel::makeCluster(ncores-keep_cores)
-  doParallel::registerDoParallel(cl)
-  `%dopar%` <- foreach::`%dopar%`
   # triangulate in parallel 
-  foreach::foreach(i = 6000:nrow(data), .packages=c("data.table","sp", "raster", "rgdal")) %dopar% {
+  for(i in 1:nrow(data)){
+    
     
     # subset data in time window
     tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
     tmp<-as.data.frame(tmp)
+    tmp<-tmp[!is.na(tmp$be),]
     tmp$animal<-animal$meta$animalID
     
     if(any(tmp$be>360)){next}
@@ -348,6 +349,8 @@ dont_plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_
       tmp2<-time_match_station(tmp, method=x, tmstmp=data$timestamp[i])
       tmp2<-tri_in(data=tmp2,stations = stations, method = x )
       tmp2$method="intersection"
+    # subset data in time window
+   
       
       # turn tmp to spatial
       sp::coordinates(tmp) <- c("x", "y")
@@ -356,20 +359,24 @@ dont_plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_
       tlmetr<-calc_telemetr(tmp=tmp, i=i, data=data, tmp2=tmp2, tw=tw, animal=animal)
       # clac distance to gps    
       tlmetr$df$lon<-median(tmp$lon)
-      tlmetr$df$df$lat<-median(tmp$lat)
+      tlmetr$df$lat<-median(tmp$lat)
       tlmetr$df$dist_gps<-raster::pointDistance(cbind(tlmetr$df$x, tlmetr$df$y), cbind(tlmetr$df$lon, tlmetr$df$lat), lonlat=T)
       
       
     }
-    # fill data frame  
-      tri_points<-rbind(tlmetr$df, tri_points)
+    else{next}
+    if(is.data.frame(tlmetr$df)){
+      tri_points<-rbind(tlmetr$df, tri_points)}
+    
   }
-  
-  parallel::stopCluster(cl)
   
   return(tri_points)
   
 }
+  
+  
+  
+
 
 
 
@@ -410,6 +417,7 @@ nice_tmp<-function(tmp2, df, animal, tw){
 
 
 calc_telemetr<-function(tmp, i, data, tmp2, tw, animal){
+  require(telemetr)
   
   tryCatch(
     expr = {

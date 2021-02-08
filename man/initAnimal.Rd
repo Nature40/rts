@@ -18,7 +18,7 @@ initAnimal(projList, animalID, freq, start, end)
 \item{end}{string, end of tracking YYYY-MM-DD}
 }
 \description{
-Creates directories and a R list with all the needed rts information for one animal
+Creates directories and a R list with all the needed tRackIT information for one animal
 }
 \author{
 Marvin Ludwig & Jannis Gottwald

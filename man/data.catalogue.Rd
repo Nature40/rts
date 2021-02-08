@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_catalogue.R
 \name{data.catalogue}
 \alias{data.catalogue}
-\title{catalogue of all rts csv with start and end date}
+\title{catalogue of all tRackIT csv with start and end date}
 \usage{
 data.catalogue(projList, in_project = TRUE, path_to_folder = ".")
 }

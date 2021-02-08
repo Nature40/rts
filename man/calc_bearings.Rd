@@ -4,7 +4,15 @@
 \alias{calc_bearings}
 \title{bearing calculation}
 \usage{
-calc_bearings(projList, animal, path_to_data, antennas, dbLoss, calibrate)
+calc_bearings(
+  projList,
+  animal,
+  path_to_data,
+  antennas,
+  dbLoss,
+  calibrate,
+  uav = FALSE
+)
 }
 \arguments{
 \item{animal}{list, generatet by initanimal}
@@ -16,6 +24,8 @@ calc_bearings(projList, animal, path_to_data, antennas, dbLoss, calibrate)
 \item{dbLoss}{num, gain loss from 0 to 90° antenna orientation}
 
 \item{calibrate}{logical, if TRUE correction values are applied}
+
+\item{uav}{logical, if TRUE antenna orientation based on uav pictures is used}
 }
 \description{
 calculates bearings using linear approximation and acos

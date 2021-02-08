@@ -12,7 +12,7 @@ initProject(projroot = ".", logger_data_raw)
 \item{logger_data_raw}{string, path to the full RTS dataset}
 }
 \description{
-Creates directories and a R list with all the needed rts information for one animal
+Creates directories and a R list with all the needed tRackIT information for one animal
 }
 \author{
 Marvin Ludwig & Jannis Gottwald

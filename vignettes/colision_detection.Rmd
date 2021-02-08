@@ -22,14 +22,14 @@ Currently, the [radio-tracking software](https://github.com/Nature40/Sensorboxes
 ### necessary packages
 
 ```{r eval=FALSE}
-library(rts)
+library(tRackIT)
 library(data.table)
 library(ggplot2)
 ```
 
 ### Initialize individuals that may have collisions
 
-First, a data.frame is created that contains the most important parameters for each individual. Then a list with metadata and folder paths is created with the help of the initAnimal function from the rts-package.
+First, a data.frame is created that contains the most important parameters for each individual. Then a list with metadata and folder paths is created with the help of the initAnimal function from the tRackIT-package.
 
 ```{r eval=FALSE}
 
@@ -50,8 +50,8 @@ anml20<-initAnimal(projList = plst, animalID = tags$ID[2], freq = tags$freq[2], 
 anml40<-initAnimal(projList = plst, animalID = tags$ID[3], freq = tags$freq[3], start=tags$start[3], end=tags$end[3])
 ````
 
-### get data from rts station
-Because all three transmitters were active at the same time in the area of rts station mof_rts_00009, we expect collisions there. The data already pre-filtered for each individual with the batch.awk and the filter_interactive function are loaded.
+### get data from tRackIT station
+Because all three transmitters were active at the same time in the area of tRackIT station mof_rts_00009, we expect collisions there. The data already pre-filtered for each individual with the batch.awk and the filter_interactive function are loaded.
 
 ```{r eval=FALSE}
 d10lst<-list.files(anml10$path$filtered, pattern="mof_rts_00009",full.names = T)

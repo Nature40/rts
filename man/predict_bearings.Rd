@@ -4,7 +4,7 @@
 \alias{predict_bearings}
 \title{bearing prediction}
 \usage{
-predict_bearings(animal, mxNA, path_to_data)
+predict_bearings(animal, mxNA, path_to_data, version = ".")
 }
 \arguments{
 \item{animal}{list, generatet by initanimal}
@@ -12,6 +12,8 @@ predict_bearings(animal, mxNA, path_to_data)
 \item{mxNA}{num, may number of missing signals accepted}
 
 \item{path_to_data}{string, path to filtered file}
+
+\item{version}{string, character string for identification}
 }
 \description{
 predict bearings using circtree model

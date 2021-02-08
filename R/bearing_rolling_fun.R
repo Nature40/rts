@@ -332,9 +332,9 @@ dont_plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_
   # register number of cores - cores_t_keep
   cl <- parallel::makeCluster(ncores-keep_cores)
   doParallel::registerDoParallel(cl)
-  
+  `%dopar%` <- foreach::`%dopar%`
   # triangulate in parallel 
-  foreach(i = 6000:nrow(data)) %dopar% {
+  foreach::foreach(i = 6000:nrow(data), .packages=c("data.table","sp", "raster", "rgdal")) %dopar% {
     
     # subset data in time window
     tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
@@ -351,7 +351,7 @@ dont_plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x, keep_
       
       # turn tmp to spatial
       sp::coordinates(tmp) <- c("x", "y")
-      sp::proj4string(tmp) <- CRS(paste0("+init=epsg:",epsg)) # WGS 84
+      sp::proj4string(tmp) <- sp::CRS(paste0("+init=epsg:",epsg)) # WGS 84
       # triangulate using telemtr package
       tlmetr<-calc_telemetr(tmp=tmp, i=i, data=data, tmp2=tmp2, tw=tw, animal=animal)
       # clac distance to gps    

@@ -7,12 +7,17 @@
 bearing_rolling_fun(
   animal,
   antennas,
-  method = "ML",
+  version = "ML",
   tw = 5,
   epsg = 4326,
   maxDB = 60,
   maxNA = 2,
-  plot_bearings = FALSE
+  GPS = FALSE,
+  plot_results = FALSE,
+  x = "ML",
+  xlim = c(8.665209, 8.700571),
+  ylim = c(50.826948, 50.849172),
+  keep_cores = 2
 )
 }
 \arguments{
@@ -20,7 +25,7 @@ bearing_rolling_fun(
 
 \item{antennas}{data.frame, Data.frame with antenna information}
 
-\item{method}{string, pattern indicating whether ML bearings or bearings based on physical model should be selected}
+\item{version}{string, character string for identification}
 
 \item{tw}{num, time window in seconds: Locations are calculated using all bearings tw sec before and after timestamp in row}
 
@@ -28,7 +33,17 @@ bearing_rolling_fun(
 
 \item{maxDB}{num, minimum value for received maximum signal strength. default=60}
 
-\item{plot_bearings}{logical, wether to plot bearings during processing or not. Slows down the calculation substantially}
+\item{GPS}{logical, if true reference gps data is expected in cols lon/lat}
+
+\item{plot_results}{logical, wether to plot bearings during processing or not. Slows down the calculation substantially}
+
+\item{x}{string, name of column with bearings. x="bearings_filtered" if hampel filtered bearings are used}
+
+\item{xlim}{numeric, x limits for plot}
+
+\item{ylim}{numeric, y limits for plot}
+
+\item{method}{string, pattern indicating whether ML bearings or bearings based on physical model should be selected}
 
 \item{maxNa}{num, max for missing receiver per row. default=2}
 }

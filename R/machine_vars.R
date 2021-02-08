@@ -33,6 +33,10 @@ machine_vars<-function(path_to_data,animal, w=c(5,11) ){
   names(data)[names(data) == "2"] <- "a_2"
   names(data)[names(data) == "3"] <- "a_3"
   
+  data$timestamp<-as.POSIXct(data$timestamp)
+  data<-data[order(data$timestamp),]
+  data$timestamp<-as.character(data$timestamp)
+  
   data$`a_0`<-imputeTS::na_interpolation( data$`a_0`, option ="linear", maxgap = 10)
   data$`a_1`<-imputeTS::na_interpolation( data$`a_1`, option ="linear", maxgap = 10)
   data$`a_2`<-imputeTS::na_interpolation( data$`a_2`, option ="linear", maxgap = 10)

@@ -24,6 +24,7 @@ triangulate<-function(method, path_to_data, animal, antennas, collision=FALSE){
   
 data<-data.table::fread(path_to_data)
 data<-as.data.frame(data)
+names(data)<-gsub("a_", "",names(data))
 data$intersection<-abs(angle_between(data$s1, data$s2))
 data$X<-NA
 data$Y<-NA
@@ -53,6 +54,41 @@ if(collision==TRUE){
 
 
 
+}
+
+
+
+
+
+
+tri_in<-function(method, data, stations){
+  
+  
+  data<-as.data.frame(data)
+  names(data)<-gsub("a_", "",names(data))
+  data$intersection<-abs(angle_between(data$s1, data$s2))
+
+  data<-data[!is.na(data$s1),]
+  data<-data[!is.na(data$s2),]
+  
+  for( i in 1:nrow(data)){
+    # print(i)
+    stations<-as.data.frame(stations)
+    s1<-stations[as.character(stations$Name)==as.character(data$name_s1)[i],]
+    s2<-stations[as.character(stations$Name)==as.character(data$name_s2)[i],]
+    tri<-triang(s1$Longitude[1],s1$Latitude[1],data$s1[i],
+                s2$Longitude[1],s2$Latitude[1],data$s2[i])
+    
+    if(is.data.frame(tri)){
+    data$x[i]<-tri$x[1]
+    data$y[i]<-tri$y[1]}
+    
+  }
+  
+  return(data)
+  
+  
+  
 }
 
 

@@ -1,4 +1,4 @@
-Package: rts
+Package: tRackIT
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
@@ -25,4 +25,10 @@ Imports:
     imputeTS,
     stringr,
     data.table,
-    fasttime
+    fasttime,
+    swfscMisc,
+    raster,
+    mapview,
+    doParallel,
+    parallel,
+    foreach

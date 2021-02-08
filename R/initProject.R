@@ -1,6 +1,6 @@
 #' Init radio-tracking project
 #'
-#' @description Creates directories and a R list with all the needed rts information for one animal
+#' @description Creates directories and a R list with all the needed tRackIT information for one animal
 #'
 #'
 #' @author Marvin Ludwig & Jannis Gottwald

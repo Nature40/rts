@@ -25,8 +25,8 @@ data<-data[!is.na(data$max_signal),]
   
   
 
-data$timestamp<-fasttime::fastPOSIXct(data$timestamp)
-data$timestamp<-data$timestamp-3*3600
+data$timestamp<-as.POSIXct(data$timestamp)
+
   
   #order by timestamp
 data<-data[order(data$timestamp),]
@@ -46,7 +46,7 @@ data<-data.table::dcast(data, timestamp+station~receiver, value.var = "max_signa
   if(nrow(data[!is.na(data$`3`),])>10){
   data$`3`<-imputeTS::na_interpolation( data$`3`, option ="linear", maxgap = 2)}
   
-
+data$timestamp<-as.character(data$timestamp)
 if(collision==TRUE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", gsub("_filtered_collision.csv", "",basename(path_to_data)), "_logger_time_match_collision.csv" ))}
 
 if(collision==FALSE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", gsub("_filtered.csv", "",basename(path_to_data)), "_logger_time_match.csv" ))}

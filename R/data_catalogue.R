@@ -1,4 +1,4 @@
-#' catalogue of all rts csv with start and end date
+#' catalogue of all tRackIT csv with start and end date
 #'
 #' @description Creates a catalogue of all raw logger files in folder
 #'

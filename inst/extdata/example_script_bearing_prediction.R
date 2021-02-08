@@ -1,4 +1,4 @@
-library(rts)
+library(tRackIT)
 library(mapview)
 library(rgdal)
 
@@ -8,11 +8,27 @@ ant<-read.csv(paste0(plst$path$ref, "antennas_2020.csv"))
 anml<-initAnimal(projList = plst, animalID = "calibration_summer", freq = 150199, start = "2020-03-01", end = "2020-05-01")
 #generate predictors
 fls<-list.files(anml$path$logger_timematch, full.names = TRUE)
-machine_vars(fls[7], animal=anml)
+
+for(i in fls){
+machine_vars(i, animal=anml)}
 
 #predict with internal model
 fls<-list.files(anml$path$vars, full.names=TRUE)
+
+for(i in fls){
 predict_bearings(animal = anml, mxNA = 1, path_to_data = fls[3])
+}
+
+anml<-initAnimal(projList = plst, animalID = "calibration_summer", freq = 150211, start = "2020-07-30", end = "2020-10-30")
+
+antennas<-read.csv(paste0(plst$path$ref, "antennas_2020.csv"))
+
+fls<-list.files(anml$path$bearings, full.names = TRUE)
+
+lapply(fls, function(x){hampel(path_to_data = x, col = "ML", k = 30, t0 = 0.5 )})
+
+bearing_rolling_fun(animal=anml, antennas = antennas, method = "ML", tw = 2,plot_bearings = FALSE)
+
 
 #time match stations
 time_match_station(anml, method="ML")

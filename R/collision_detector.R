@@ -15,7 +15,7 @@
 #' @param path_to_d40 string, path to filtered file of tag with 40ms duration (same time period and station as d10,d20)
 #' @param td10 num, expected timedifference between signals of tag with 10ms duration
 #' @param td20 num, expected timedifference between signals of tag with 20ms duration
-#' 
+#' @import data.table
 #'
 #' @export
 #'

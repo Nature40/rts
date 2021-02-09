@@ -87,7 +87,7 @@ if(GPS==FALSE & plot_results==TRUE){
 }
 
 
-saveRDS(tri_points, paste0(anml$path$triangulations,"/", anml$meta$animalID, "_telemtr_triangulations_",x, "_", tw, ".rds"))
+saveRDS(tri_points, paste0(anml$path$triangulations,"/", anml$meta$animalID, "_telemtr_triangulations_",x, "_",version, "_",tw, ".rds"))
 
 }
 

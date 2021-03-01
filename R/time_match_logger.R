@@ -47,9 +47,11 @@ data<-data.table::dcast(data, timestamp+station~receiver, value.var = "max_signa
   data$`3`<-imputeTS::na_interpolation( data$`3`, option ="linear", maxgap = 2)}
   
 data$timestamp<-as.character(data$timestamp)
+
+
 if(collision==TRUE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", gsub("_filtered_collision.csv", "",basename(path_to_data)), "_logger_time_match_collision.csv" ))}
 
-if(collision==FALSE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", gsub("_filtered.csv", "",basename(path_to_data)), "_logger_time_match.csv" ))}
+if(collision==FALSE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", gsub("_filtered.csv", "",basename(path_to_data)), "_logger_time_match.csv" ), col.names = TRUE)}
 
 
 }

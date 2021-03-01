@@ -288,14 +288,15 @@ plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
       
       tlmetr<-calc_telemetr(tmp=tmp, i=i, data=data, tmp2=tmp2, tw=tw, animal=animal)
       
+      if(is.data.frame(tlmetr$df)){
       # clac distance to gps  
-      gps<-as.data.frame(gps)
-      tlmetr$df$lon<-median(gps$lon)
-      tlmetr$df$lat<-median(gps$lat)
+      gp<-as.data.frame(gps)
+      tlmetr$df$lon<-median(gp$lon)
+      tlmetr$df$lat<-median(gp$lat)
       tlmetr$df$dist_gps<-raster::pointDistance(cbind(tlmetr$df$x, tlmetr$df$y), cbind(tlmetr$df$lon, tlmetr$df$lat), lonlat=T)
       print(paste0("mle: ",tlmetr$mle$cor, "min dist: ", min(tlmetr$df$dist_gps, na.rm=TRUE)))
       print(tlmetr$df$intersection_max[1])
-      print(tlmetr$df$intersection_min[1])
+      print(tlmetr$df$intersection_min[1])} else{next}
       
       
     }
@@ -504,6 +505,8 @@ calc_telemetr<-function(tmp, i, data, tmp2, tw, animal){
   }
   
   df<-as.data.frame(df)
+  if(is.data.frame(df))
+  {
   
   tmp2<-nice_tmp(tmp2=tmp2, df=df, animal=animal, tw=tw)
   
@@ -518,6 +521,7 @@ calc_telemetr<-function(tmp, i, data, tmp2, tw, animal){
   df<-df[!is.na(df$x),]
   
   return(list(mle=mle, hub=hub, and=and, df=df))
+  }
   
   
 }

@@ -13,7 +13,7 @@
 #' @param max_dur num, maximum duration of signal
 #' @param in_project logical, if true the awk command is created from the data in the project folder
 #' @param path_to_folder string, awk command is created from the data in the indicated folder 
-#'
+#' @param OS string, operating system ("Windows", "MacOS", "Linux")
 #'
 #' @export
 #'
@@ -21,11 +21,27 @@
 
 
 
-batch.awk<-function(animal, projList, freq_er_l, freq_er_r, min_dur, max_dur, in_project, path_to_folder){
+batch.awk<-function(animal, projList, freq_er_l, freq_er_r, min_dur, max_dur, in_project, path_to_folder, OS){
 
+if(OS=="Windows"){
 file.create(paste0(projList$path$awk, "/",animal$meta$animalID, ".bat"))
 
 filePath<-paste0(projList$path$awk,"/", animal$meta$animalID, ".bat")
+}
+  
+if(OS=="MacOS"){
+  file.create(paste0(projList$path$awk, "/",animal$meta$animalID, ".command"))
+    
+  filePath<-paste0(projList$path$awk,"/", animal$meta$animalID, ".command")
+}
+  
+if(OS=="Linux"){
+  file.create(paste0(projList$path$awk, "/",animal$meta$animalID, ".sh"))
+    
+  filePath<-paste0(projList$path$awk,"/", animal$meta$animalID, ".sh")
+  }
+  # 
+  # 
 # 
 
 cat_lst<-list.files(projList$path$catalogues, pattern="data_catalogue", full.names = T)

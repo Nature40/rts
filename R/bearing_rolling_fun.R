@@ -29,7 +29,7 @@
 #'
 
 
-bearing_rolling_fun<-function(animal, antennas, version="ML", tw=5, epsg=4326, maxDB=60, maxNA=2, GPS=FALSE, plot_results=FALSE, x="ML", xlim=c(8.665209, 8.700571), ylim=c(50.826948, 50.849172), keep_cores=2){
+bearing_rolling_fun<-function(animal, antennas,version="", tw=5, epsg=4326, maxDB=60, maxNA=2, GPS=FALSE, plot_results=FALSE, x="ML", xlim=c(8.665209, 8.700571), ylim=c(50.826948, 50.849172), keep_cores=2){
 
 
 # get rid of duplicates in stations
@@ -48,6 +48,9 @@ data<-plyr::ldply(fls, function(x){
   })
 
 #filter by maxDB and naCount
+if(!("naCount" %in% colnames(data))){
+  colnames(data)<-gsub("a_", "", colnames(data))
+data$naCount<-rowSums(is.na(data[,c("0","1","2","3"  )]))}
 data<-data[data$max_dB>=maxDB & data$naCount<=maxNA,]
 # x = colname of bearingsings beari
 data$be<-data[,x]
@@ -151,6 +154,7 @@ plot_it<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
       tlmetr<-calc_telemetr(tmp=tmp, i=i, data=data, tmp2=tmp2, tw=tw, animal=animal)
       
       # print intersection
+      print(paste0("mle: ",tlmetr$mle$cor))
       print(tlmetr$df$intersection_max[1])
       print(tlmetr$df$intersection_min[1])
       
@@ -234,9 +238,10 @@ plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
   # create data frame to fill
   tri_points<-data.frame()
   
+  
   # triangulate row by row      
   for(i in 1:nrow(data)){
-    print(i)
+    
     
     # subset data in time window
     tmp<-data[data$ftime>=(data$ftime[i]-tw) & data$ftime<=(data$ftime[i]+tw),]
@@ -294,16 +299,15 @@ plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
       tlmetr$df$lon<-median(gp$lon)
       tlmetr$df$lat<-median(gp$lat)
       tlmetr$df$dist_gps<-raster::pointDistance(cbind(tlmetr$df$x, tlmetr$df$y), cbind(tlmetr$df$lon, tlmetr$df$lat), lonlat=T)
-      print(paste0("mle: ",tlmetr$mle$cor, "min dist: ", min(tlmetr$df$dist_gps, na.rm=TRUE)))
-      print(tlmetr$df$intersection_max[1])
-      print(tlmetr$df$intersection_min[1])} else{next}
+      } else{next}
       
       
     }
     else{next}
     
     
-    plot(tmp, xlim=range(8.665209, 8.700571), ylim=range(50.826948, 50.849172))
+    plot(tmp, xlim=range(8.665209, 8.700571), ylim=range(50.826948, 50.849172),main=paste0("mle correlation: ",tlmetr$mle$cor, "\nmin pos error: ", min(tlmetr$df$dist_gps, na.rm=TRUE), "\nmin intersection: ", tlmetr$df$intersection_min[1], "\nmax intersection: ", tlmetr$df$intersection_max[1], "\nprogress: ", i/nrow(data)), cex.main=0.8
+    )
     points(stations)
     telemetr:::drawVectors(~be|animal,tmp)
     points(tlmetr$mle,pch=19,col="blue")
@@ -313,6 +317,7 @@ plot_it_gps<-function(data, tw, xlim, ylim, animal,epsg, stations, x){
     points(intersect_mean,pch=20,col="orange")
     points(gps,pch=20,col="red")
     
+   
     
     if(is.data.frame(tlmetr$df)){
       tri_points<-rbind(tlmetr$df, tri_points)}

@@ -4,12 +4,14 @@
 \alias{time_match_logger}
 \title{time match logger data}
 \usage{
-time_match_logger(animal, path_to_data, collision = FALSE)
+time_match_logger(animal, path_to_data, collision = FALSE, version)
 }
 \arguments{
 \item{path_to_data}{string, path to filtered data}
 
 \item{collision}{logical, if collision corrected data is used a suffix is added to resulting file name}
+
+\item{version}{string, string pattern specifying the version of data processing}
 
 \item{animalID}{string, label of the tagged individual}
 }

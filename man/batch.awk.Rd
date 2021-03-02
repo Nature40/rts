@@ -12,7 +12,8 @@ batch.awk(
   min_dur,
   max_dur,
   in_project,
-  path_to_folder
+  path_to_folder,
+  OS
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ batch.awk(
 \item{in_project}{logical, if true the awk command is created from the data in the project folder}
 
 \item{path_to_folder}{string, awk command is created from the data in the indicated folder}
+
+\item{OS}{string, operating system ("Windows", "MacOS", "Linux")}
 }
 \description{
 Creates .bat files for prefiltering with awk

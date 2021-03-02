@@ -4,7 +4,7 @@
 \alias{machine_vars}
 \title{create variables for ML}
 \usage{
-machine_vars(path_to_data, animal, w = c(5, 11))
+machine_vars(path_to_data, animal, w = c(5, 11), version)
 }
 \arguments{
 \item{path_to_data}{string, path to station data}

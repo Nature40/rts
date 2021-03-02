@@ -10,6 +10,7 @@
 #' @param animalID string, label of the tagged individual
 #' @param path_to_data string, path to filtered data
 #' @param collision logical, if collision corrected data is used a suffix is added to resulting file name
+#' @param version string, string pattern specifying the version of data processing
 #' 
 #'
 #' @export
@@ -18,7 +19,7 @@
 
 
 
-time_match_logger<-function(animal, path_to_data, collision=FALSE){
+time_match_logger<-function(animal, path_to_data, collision=FALSE, version){
 data<-data.table::fread(path_to_data)
   
 data<-data[!is.na(data$max_signal),]
@@ -49,9 +50,9 @@ data<-data.table::dcast(data, timestamp+station~receiver, value.var = "max_signa
 data$timestamp<-as.character(data$timestamp)
 
 
-if(collision==TRUE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", gsub("_filtered_collision.csv", "",basename(path_to_data)), "_logger_time_match_collision.csv" ))}
+if(collision==TRUE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", data$station[1], "_",version, "_logger_time_match_collision.csv" ))}
 
-if(collision==FALSE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/", gsub("_filtered.csv", "",basename(path_to_data)), "_logger_time_match.csv" ), col.names = TRUE)}
+if(collision==FALSE){data.table::fwrite(data, paste0(animal$path$logger_timematch, "/",data$station[1], "_",version, "_logger_time_match.csv" ))}
 
 
 }

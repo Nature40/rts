@@ -4,16 +4,7 @@
 \alias{collision_detector}
 \title{identify signal collision}
 \usage{
-collision_detector(
-  animal10,
-  animal20,
-  animal40,
-  path_to_d10,
-  path_to_d20,
-  path_to_d40,
-  td10,
-  td20
-)
+collision_detector(animal10, animal20, animal40, td10, td20, version)
 }
 \arguments{
 \item{animal10}{list, generatet by initanimal-meta information of tag with 10ms duration}
@@ -22,15 +13,11 @@ collision_detector(
 
 \item{animal40}{list, generatet by initanimal-meta information of tag with 40ms duration}
 
-\item{path_to_d10}{string, path to filtered file of tag with 10ms duration (same time period and station as d20,d40)}
-
-\item{path_to_d20}{string, path to filtered file of tag with 20ms duration (same time period and station as d10,d40)}
-
-\item{path_to_d40}{string, path to filtered file of tag with 40ms duration (same time period and station as d10,d20)}
-
 \item{td10}{num, expected timedifference between signals of tag with 10ms duration}
 
 \item{td20}{num, expected timedifference between signals of tag with 20ms duration}
+
+\item{version}{string,string pattern specifying the version of data processing}
 }
 \description{
 find collsions between tags of same frequency but different signal duration by finding gaps in the timeseries

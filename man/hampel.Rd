@@ -4,7 +4,7 @@
 \alias{hampel}
 \title{hampel filter}
 \usage{
-hampel(path_to_data, col, k, t0 = 0.5, animal)
+hampel(path_to_data, col, k, t0 = 0.5, animal, ncores)
 }
 \arguments{
 \item{path_to_data}{string, dpath to file containing bearings}

@@ -13,16 +13,19 @@
 #' @param dbLoss num, gain loss from 0 to 90° antenna orientation
 #' @param calibrate logical, if TRUE correction values are applied
 #' @param uav logical, if TRUE antenna orientation based on uav pictures is used
-#'
+#' @param version string, string pattern specifying the version of data processing
 #' @export
 #'
 #'
 
 
-calc_bearings<-function(projList,animal, path_to_data, antennas, dbLoss,calibrate, uav=FALSE){
+calc_bearings<-function(projList,animal, path_to_data, antennas, dbLoss,calibrate, uav=FALSE, version){
   
   data<-data.table::fread(path_to_data)
-  
+  if(all((c("timestamp", "station", "0", "1", "2", "3") %in% data[1,]))){
+    names(data) <- as.character(unlist(data[1,]))
+    data<-data[-1,]
+    }
   
   
   if(calibrate){
@@ -43,9 +46,9 @@ calc_bearings<-function(projList,animal, path_to_data, antennas, dbLoss,calibrat
   b$antennas<-rowSums(!is.na(b[,c("0","1","2","3"  )]))
   b$max_dB<- apply(b[, c("0","1","2","3"  )], 1, max, na.rm=TRUE)
   if(calibrate==TRUE){
-  data.table::fwrite(b, paste0(animal$path$bearings, "/",gsub(".csv", "", basename(path_to_data)), "_phys_bearings_calibrated.csv"))}
+  data.table::fwrite(b, paste0(animal$path$bearings, "/",b$station[1],"_", version, "_phys_bearings_calibrated.csv"))}
   if(calibrate==FALSE){
-    data.table::fwrite(b, paste0(animal$path$bearings, "/",gsub(".csv", "", basename(path_to_data)), "_phys_bearings.csv"))}
+    data.table::fwrite(b, paste0(animal$path$bearings, "/",b$station[1],"_", version, "_phys_bearings.csv"))}
   
 }
 

@@ -29,4 +29,7 @@ Imports:
     swfscMisc,
     raster,
     sp,
-    telemetr
+    telemetr,
+    doSNOW,
+    reshape2,
+    foreach

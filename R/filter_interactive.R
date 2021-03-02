@@ -11,6 +11,7 @@
 #' @param projList list, generatet by initProject function
 #' @param station string, path to awk filtered file
 #' @param nth num, subset data for plotting using only every nth column
+#' @param version string, string pattern specifying the version of data processing
 #' 
 #'
 #' @export
@@ -21,7 +22,7 @@
 
 
 
-filter_interactive<-function(projList, animal, path_to_data=".", nth){
+filter_interactive<-function(projList, animal, path_to_data=".", nth, version="."){
   
 
   stat<-data.table::fread(path_to_data)
@@ -37,7 +38,7 @@ filter_interactive<-function(projList, animal, path_to_data=".", nth){
 
   if(continue()=="Y"){
     
-  cat("willst du die daten im oberen dB Bereich abschneiden, weil z.B. ein weiterer Sender reinfunkt? Wenn nicht gebe gleich einen Wert ein, der oberhalb deiner Verteilung liegt")
+  cat("Do you want to cut off the data in the upper dB range because, for example, another transmitter is interfering? If not, enter a value that lies above your distribution e.g. 120.")
   c1<-where_cut()
   stat<-stat[stat$max_signal<=c1,]
   
@@ -52,7 +53,7 @@ filter_interactive<-function(projList, animal, path_to_data=".", nth){
     
     dat<-stat
     
-    cat("Als naechstes kannst du die Daten unterhalb eines wertes rechts und links der Mittelfrequenz abschneiden. Hier erstmal grob den gesamten Pilz-z.B. <80dB links (-3) rechts (+10)")
+    cat("Next, you can cut off the data below a value to the right and left of the centre frequency.Here, the entire umbrella-shaped distribution is roughly cut out - e.g. <80dB left (-3) right (+10).")
   lst1<-upper_cut()
   lst1<-unlist(lst1)
   
@@ -75,7 +76,7 @@ filter_interactive<-function(projList, animal, path_to_data=".", nth){
   
   while(!done){
     
-    cat("hier wird unterhalb des Schirms etwas feiner ausgeschnitten. z.B unterhalb 60dB links(-0.5) und rechts (1)")
+    cat("here, below the umbrella, the stem is cut out a little finer. e.g. below 60dB left(-0.5) and right (1)")
     
     dat2<-dat
     tmp = dat2[seq(1, nrow(dat), nth), ]
@@ -107,7 +108,7 @@ filter_interactive<-function(projList, animal, path_to_data=".", nth){
     
     
     df<-dat2
-    cat("hier kannst du angeben zwischen welchem unteren und oberen dB Wert die Mittelfrequenz und die Standardabweichung berechnet werden sollen. z.B. unten 55 oben 60 ")
+    cat("Here you can specify between which lower and upper dB value the mean frequency and the standard deviation should be calculated. e.g. lower 55 upper 60 ")
   lst3<-fun_fine()
 
   lst3<-unlist(lst3)
@@ -119,14 +120,14 @@ filter_interactive<-function(projList, animal, path_to_data=".", nth){
   sd_freq<-4*sd(tmp[tmp$max_signal>=lst3[1] & tmp$max_signal<=lst3[2],]$signal_freq)
   print(sd_freq)
   
-  cat("wenn die Standardabweichung kleiner 1 und Mittelfrequenz im Bereich der Senderfrequenz Y")
+  cat("If the standard deviation is less than 1 and the mean frequency is in the range of the transmitter frequency, then answer with Y ")
   ok<-fun_param_okay(mid_freq = mid_freq, sd_freq = sd_freq)
   
   if(ok=="Y"){
   
   df$sig_diff<-abs(df$signal_freq-(mid_freq))
   
-  cat("Ab wo soll mit der Standardabweichung ausgeschnitten werden? In der Regel ein Wert knapp ueber deem Muellteppich")
+  cat("From where should the standard deviation be used to cut out? As a rule, a value just above the garbage carpet.")
   c<-where_cut()
   
   df<-df[!(df$max_signal<=c & df$sig_diff>=sd_freq),]
@@ -147,7 +148,7 @@ filter_interactive<-function(projList, animal, path_to_data=".", nth){
   
   write.csv(param,paste0(projList$path$param_lst, "/", animal$meta$animalID,"_",df$station[1], "_filter_parameter.csv"))
   
-  data.table::fwrite(df, paste0(animal$path$filtered, "/",gsub(".csv", "", basename(path_to_data)), "_filtered.csv"))
+  data.table::fwrite(df, paste0(animal$path$filtered, "/",df$station[1],"_",version, "_filtered.csv"))
   
   
 }}

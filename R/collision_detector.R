@@ -10,11 +10,9 @@
 #' @param animal10 list, generatet by initanimal-meta information of tag with 10ms duration
 #' @param animal20 list, generatet by initanimal-meta information of tag with 20ms duration
 #' @param animal40 list, generatet by initanimal-meta information of tag with 40ms duration
-#' @param path_to_d10 string, path to filtered file of tag with 10ms duration (same time period and station as d20,d40)
-#' @param path_to_d20 string, path to filtered file of tag with 20ms duration (same time period and station as d10,d40)
-#' @param path_to_d40 string, path to filtered file of tag with 40ms duration (same time period and station as d10,d20)
 #' @param td10 num, expected timedifference between signals of tag with 10ms duration
 #' @param td20 num, expected timedifference between signals of tag with 20ms duration
+#' @param version string,string pattern specifying the version of data processing
 #' @import data.table
 #'
 #' @export
@@ -24,11 +22,23 @@
 
 
 
-collision_detector<-function(animal10, animal20, animal40, path_to_d10, path_to_d20, path_to_d40, td10, td20){
+collision_detector<-function(animal10, animal20, animal40,td10, td20, version){
 
-d10<-data.table::fread(path_to_d10)
-d20<-data.table::fread(path_to_d20)
-d40<-data.table::fread(path_to_d40)
+fls10<-list.files(animal10$path$filtered, pattern=version, full.names = TRUE)
+fls20<-list.files(animal20$path$filtered, pattern=version, full.names = TRUE)
+fls40<-list.files(animal40$path$filtered, pattern=version, full.names = TRUE)
+
+
+dat10<-plyr::ldply(fls10, function(x){data.table::fread(x)})
+dat20<-plyr::ldply(fls20, function(x){data.table::fread(x)})
+dat40<-plyr::ldply(fls40, function(x){data.table::fread(x)})
+
+stats<-unique(c(unique(dat10$station), unique(dat20$station), unique(dat40$station)))
+for(s in stats){
+  
+d10<-dat10[dat10$station==s,]
+d20<-dat20[dat20$station==s,]
+d40<-dat40[dat40$station==s,]
 
 d10$timestamp<-as.POSIXct(d10$timestamp)
 d20$timestamp<-as.POSIXct(d20$timestamp)
@@ -66,7 +76,7 @@ d20_r$timediff<-abs(difftime( d20_r$timestamp, d20_r$timestamp[2:length(d20_r$ti
 
 print("subset timediff")
 d10_c<-d10_r[d10_r$timediff>=td10+(td10*0.2) & d10_r$timediff<=2*td10+(td10*0.2), ]
-d20_c<-d20_r[d20_r$timediff>=td20+(td20*0.5) & d20_r$timediff<=2*td20+(td20*0.5), ]
+d20_c<-d20_r[d20_r$timediff>=td20+(td20*0.2) & d20_r$timediff<=2*td20+(td20*0.2), ]
 
 
 print("timediff df")
@@ -101,9 +111,9 @@ p20v40$timediff<-abs(difftime(p20v40$timeControld40, p20v40$timestamp_control, u
 
 
 #threshold
-p10v20<-p10v20[p10v20$timediff<=0.06,]
-p10v40<-p10v40[p10v40$timediff<=0.06,]
-p20v40<-p20v40[p20v40$timediff<=0.06,]
+p10v20<-p10v20[p10v20$timediff<=0.1,]
+p10v40<-p10v40[p10v40$timediff<=0.1,]
+p20v40<-p20v40[p20v40$timediff<=0.1,]
 
 d20_r$collision[d20_r$ID %in% p10v20$ID]<-"yes"
 d40_r$collision[d40_r$ID %in% p10v40$ID]<-"yes"
@@ -113,12 +123,14 @@ d40_r$collision[d40_r$ID %in% p20v40$ID]<-"yes"
 data10<-rbind(data10, d10_r)
 data20<-rbind(data20, d20_r)
 data40<-rbind(data40, d40_r)
+
 }
 
-data.table::fwrite(data10, paste0(animal10$path$filtered, "/",gsub(".csv", "", basename(path_to_d10)), "_collision.csv" ))
-data.table::fwrite(data20, paste0(animal20$path$filtered, "/",gsub(".csv", "", basename(path_to_d20)), "_collision.csv" ))
-data.table::fwrite(data40, paste0(animal40$path$filtered, "/",gsub(".csv", "", basename(path_to_d40)), "_collision.csv" ))
+data.table::fwrite(data10, paste0(animal10$path$filtered, "/",data10$station[1],"_", version, "_collision.csv" ))
+data.table::fwrite(data20, paste0(animal20$path$filtered, "/",data20$station[1],"_", version, "_collision.csv" ))
+data.table::fwrite(data40, paste0(animal40$path$filtered, "/",data40$station[1],"_", version, "_collision.csv" ))
 
+}
 
 }
 

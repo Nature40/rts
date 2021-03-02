@@ -7,7 +7,7 @@
 bearing_rolling_fun(
   animal,
   antennas,
-  version = "ML",
+  version = "",
   tw = 5,
   epsg = 4326,
   maxDB = 60,

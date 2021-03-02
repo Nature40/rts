@@ -12,20 +12,25 @@
 #' @param k numeric, window size n seconds
 #' @param t0 numeric,threshold for median filter. A high threshold makes the filter more forgiving, a low one will declare more points to be outliers. Default=0.5
 #' 
-#' 
+#' @import foreach
 #'
 #' @export
 #'
 #'
 
 
-hampel <- function (path_to_data,col, k, t0 = 0.5, animal)
-{
+hampel <- function (path_to_data,col, k, t0 = 0.5, animal, ncores){
+  
+  cl <-parallel::makeCluster(ncores)
+  doSNOW::registerDoSNOW(cl)
+  print(path_to_data)
   data<-data.table::fread(path_to_data)
+  
   #   x:  vector or time series
   #   k:  window [x_(i-k),...,x_i,...,x_(i+k)]
 
   data<-as.data.frame(data)
+  data<-data[data$`0`!=0,]
   data$timestamp<-as.POSIXct(data$timestamp)
   data[,paste0("bearings_filtered_", col)]<-data[,col]
   data<-data[!is.na(data[,paste0("bearings_filtered_", col)]),]
@@ -37,13 +42,20 @@ hampel <- function (path_to_data,col, k, t0 = 0.5, animal)
   # t0 <- 3        # Pearson's 3 sigma edit rule
   
   # we don't look at outliers at the end parts of x !
-  for ( i in 1:n ) {
+  iterations <- nrow(data)
+  pb <- txtProgressBar(max = iterations, style = 3)
+  progress <- function(n) setTxtProgressBar(pb, n)
+  opts <- list(progress = progress)
+  `%dopar%` <- foreach::`%dopar%`
+  
+ data<- foreach::foreach(i = 1:nrow(data), .combine=rbind, .options.snow = opts) %dopar% {
     #print(i)
     x0 <- median(data[,col][data$timestamp>=data$timestamp[i]-k & data$timestamp<=data$timestamp[i]+k ] )
     S0 <- L * median( abs(data[,col][data$timestamp>=data$timestamp[i]-k & data$timestamp<=data$timestamp[i]+k ] - x0) )
     if ( abs(data[,col][i]-x0) > t0 * S0 ) {
       data[,paste0("bearings_filtered_", col)][i] <- x0
       ind <- c(ind, i)
+      data[i,,drop=FALSE]
     }
   }
   # return a list with 2 components
@@ -52,6 +64,7 @@ hampel <- function (path_to_data,col, k, t0 = 0.5, animal)
   data$timestamp<-as.character(data$timestamp)
   
   data.table::fwrite(data, paste0(animal$path$bearings_filtered, "/",gsub(".csv", "", basename(path_to_data)), "_hample_filtered.csv"))
+  parallel::stopCluster(cl)
 }
 
 

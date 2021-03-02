@@ -11,7 +11,8 @@ calc_bearings(
   antennas,
   dbLoss,
   calibrate,
-  uav = FALSE
+  uav = FALSE,
+  version
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ calc_bearings(
 \item{calibrate}{logical, if TRUE correction values are applied}
 
 \item{uav}{logical, if TRUE antenna orientation based on uav pictures is used}
+
+\item{version}{string, string pattern specifying the version of data processing}
 }
 \description{
 calculates bearings using linear approximation and acos
